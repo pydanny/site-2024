@@ -1,0 +1,8 @@
+{% extends "layout/base.html" %}
+{% block content %}
+<h1>Tags</h1>
+
+{% for k, v in tags.items() %}
+  {{ k }} ({{ v}})
+{% endfor %}
+{% endblock content %}

@@ -1,0 +1,17 @@
+{% extends "layout/base.html" %}
+{% block content %}
+<h1>Articles</h1>
+
+{% for article in articles %}
+<article>
+    <h2><a href="">{{ article.title }}</a></h2>
+    <p>
+      {% if article.description %}
+      {{ article.description }}<br/>  
+      {% endif %}
+      <small><time datetime="{{ article.date }}">{{ article.date }}</time></small><br />
+      {% for tag in article.tags %}{{ tag}} {% endfor %}
+    </p>
+  </article>
+{% endfor %}
+{% endblock %}

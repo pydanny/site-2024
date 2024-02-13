@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>TODO</title>
+    <link href="{{ url_for('static', path='/normalize.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/sakura.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/custom.css') }}" rel="stylesheet">
+</head>
+<body>
+    <header>
+
+    </header>
+    <main>
+        {% block content required %}{% endblock content %}
+    </main>
+    <footer>
+        <p>
+          <a href="https://fosstodon.org/@danielfeldroy">Mastodon</a> |
+          <a href="https://www.linkedin.com/in/danielfeldroy/">LinkedIn</a> |
+          <a href="https://twitter.com/pydanny">Twitter</a> |
+          <a href="/feeds/atom.xml">Atom Feed</a>
+        </p>
+        <p>All rights reserved {% now 'utc', '%Y' %}, Daniel Roy Greenfeld</p>
+    </footer>    
+</body>
+</html>

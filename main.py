@@ -1,0 +1,68 @@
+import yaml
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+import jinja2
+
+import pathlib
+
+env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
+    extensions=['jinja2_time.TimeExtension', "jinja2.ext.debug"])
+templates = Jinja2Templates(env=env)
+
+
+app = FastAPI(docs_url="/api/docs")
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/api")
+async def root():
+    return {"message": "Hello World"}
+
+
+@app.get("/")
+async def index(request: Request, response_class=HTMLResponse):
+    return templates.TemplateResponse(
+        request=request, name="index.html"
+    )
+
+def get_articles(published: bool = True) -> list[dict]:
+    articles: list[dict] = []
+    for article in pathlib.Path(".").glob("posts/*.md"):
+        raw: str = article.read_text().split('---')[1]
+        data: dict = yaml.safe_load(raw)
+        articles.append(data)   
+
+    articles = [x for x in filter(lambda x: x['published'] is True, articles)]
+
+    articles.sort(key=lambda x: x['date'], reverse=True)
+    return [x for x in filter(lambda x: x['published'] is published, articles)]
+
+@app.get("/posts")
+async def posts(request: Request, response_class=HTMLResponse):
+    articles: list[dict] = get_articles()
+
+    articles.sort(key=lambda x: x['date'], reverse=True)
+
+    return templates.TemplateResponse(
+        request=request, name="posts.html", context={"articles": articles}
+    )
+
+
+@app.get("/tags")
+async def tags(request: Request, response_class=HTMLResponse):
+    articles: list[dict] = get_articles()
+
+    tags: dict = {}
+    for article in articles:
+        for tag in article.get('tags', []):
+            if tag in tags:
+                tags[tag] += 1
+            else:
+                tags[tag] = 1
+
+    return templates.TemplateResponse(
+        request=request, name="tags.html", context={"tags": tags}
+    )
