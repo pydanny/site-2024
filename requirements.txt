@@ -5,3 +5,5 @@ websockets
 jinja2
 jinja2-time
 pyyaml
+markdown
+pymdown-extensions

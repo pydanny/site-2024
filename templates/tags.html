@@ -2,7 +2,7 @@
 {% block content %}
 <h1>Tags</h1>
 
-{% for k, v in tags.items() %}
-  {{ k }} ({{ v}})
+{% for tag, count in tags.items() %}
+  <a href="/tags/{{ tag }}">{{ tag }}</a> ({{ count }})
 {% endfor %}
 {% endblock content %}
