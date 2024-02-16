@@ -51,7 +51,7 @@ async def index(request: Request, response_class=HTMLResponse):
 async def post(slug: str, request: Request, response_class=HTMLResponse):
     article = [x for x in filter(lambda x: x['slug'] == slug, get_articles())][0]
     content = pathlib.Path(f"posts/{slug}.md").read_text().split('---')[2]
-    article['content'] = markdown.markdown(content, extensions=['fenced_code', 'pymdownx.superfences'])
+    article['content'] = markdown.markdown(content, extensions=['pymdownx.superfences'])
 
     return templates.TemplateResponse(
         request=request, name="post.html", context={"article": article}
