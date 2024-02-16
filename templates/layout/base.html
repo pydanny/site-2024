@@ -1,6 +1,10 @@
 <html>
 <head>
-    <title>TODO</title>
+    {% if metadata %}
+        <title>{{ metadata.title|default("Daniel Roy Greenfeld") }}</title>
+    {% else %}
+        <title>Daniel Roy Greenfeld</title>
+    {% endif %}
     <link href="{{ url_for('static', path='/normalize.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', path='/sakura.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', path='/pygments.css') }}" rel="stylesheet">
@@ -49,7 +53,7 @@
     <footer>
         <p>
           <a href="https://fosstodon.org/@danielfeldroy">Mastodon</a> |
-          <a href="https://www.linkedin.com/in/danielfeldroy/">aedIn</a> |
+          <a href="https://www.linkedin.com/in/danielfeldroy/">LinkedIn</a> |
           <a href="https://twitter.com/pydanny">Twitter</a> |
           <a href="/feeds/atom.xml">Atom Feed</a>
         </p>

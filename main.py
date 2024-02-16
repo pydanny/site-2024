@@ -36,6 +36,20 @@ def get_articles(published: bool = True) -> list[dict]:
     return [x for x in filter(lambda x: x['published'] is published, articles)]
 
 
+def load_content_from_markdown_file(path: pathlib.Path) -> dict[str, str|dict]:
+    raw: str = path.read_text()
+    # Metadata is the first part of the file
+    page = {}
+    page['metadata'] = yaml.safe_load(raw.split('---')[1])
+
+    # Content is the second part of the file
+    content_list: list = raw.split('---')[2:]
+    page['markdown'] = '\n---\n'.join(content_list)
+    page['html'] = markdown(page['markdown'])
+
+    return page
+
+
 @app.get("/api")
 async def root():
     return {"message": "Hello World"}
@@ -46,8 +60,6 @@ async def index(request: Request, response_class=HTMLResponse):
     return templates.TemplateResponse(
         request=request, name="index.html"
     )
-
-
 
 
 @app.get("/posts/{slug}")
@@ -96,4 +108,20 @@ async def tag(tag: str, request: Request, response_class=HTMLResponse):
 
     return templates.TemplateResponse(
         request=request, name="tag.html", context={"tag": tag, "articles": articles}
+    )
+
+
+@app.get("/{slug}")
+async def page(slug: str, request: Request, response_class=HTMLResponse):
+    path = pathlib.Path(f"pages/{slug}.md")
+    try:
+        page: dict[str, str|dict] = load_content_from_markdown_file(path)
+    except FileNotFoundError:
+        return templates.TemplateResponse(
+            request=request, name="404.html", status_code=404
+        )
+    page['slug'] = slug
+
+    return templates.TemplateResponse(
+        request=request, name="page.html", context={"page": page}
     )
