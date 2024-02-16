@@ -1,53 +1,29 @@
-import functools
+
 import pathlib
 
 import jinja2
-import markdown as md
-import yaml
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+import helpers
 
 
 env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
     extensions=['jinja2_time.TimeExtension', "jinja2.ext.debug"])
 templates = Jinja2Templates(env=env)
 
-markdown = functools.partial(md.markdown, extensions=['pymdownx.superfences'])
+
 
 
 app = FastAPI(docs_url="/api/docs")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@functools.lru_cache
-def get_articles(published: bool = True) -> list[dict]:
-    articles: list[dict] = []
-    for article in pathlib.Path(".").glob("posts/*.md"):
-        raw: str = article.read_text().split('---')[1]
-        data: dict = yaml.safe_load(raw)
-        data['slug'] = article.stem
-        articles.append(data)   
-
-    articles = [x for x in filter(lambda x: x['published'] is True, articles)]
-
-    articles.sort(key=lambda x: x['date'], reverse=True)
-    return [x for x in filter(lambda x: x['published'] is published, articles)]
 
 
-def load_content_from_markdown_file(path: pathlib.Path) -> dict[str, str|dict]:
-    raw: str = path.read_text()
-    # Metadata is the first part of the file
-    page = {}
-    page['metadata'] = yaml.safe_load(raw.split('---')[1])
 
-    # Content is the second part of the file
-    content_list: list = raw.split('---')[2:]
-    page['markdown'] = '\n---\n'.join(content_list)
-    page['html'] = markdown(page['markdown'])
-
-    return page
 
 
 @app.get("/api")
@@ -64,9 +40,9 @@ async def index(request: Request, response_class=HTMLResponse):
 
 @app.get("/posts/{slug}")
 async def post(slug: str, request: Request, response_class=HTMLResponse):
-    article = [x for x in filter(lambda x: x['slug'] == slug, get_articles())][0]
+    article = [x for x in filter(lambda x: x['slug'] == slug, helpers.get_articles())][0]
     content = pathlib.Path(f"posts/{slug}.md").read_text().split('---')[2]
-    article['content'] = markdown(content)
+    article['content'] = helpers.markdown(content)
 
     return templates.TemplateResponse(
         request=request, name="post.html", context={"article": article}
@@ -74,7 +50,7 @@ async def post(slug: str, request: Request, response_class=HTMLResponse):
 
 @app.get("/posts")
 async def posts(request: Request, response_class=HTMLResponse):
-    articles: list[dict] = get_articles()
+    articles: list[dict] = helpers.get_articles()
 
     articles.sort(key=lambda x: x['date'], reverse=True)
 
@@ -85,7 +61,7 @@ async def posts(request: Request, response_class=HTMLResponse):
 
 @app.get("/tags")
 async def tags(request: Request, response_class=HTMLResponse):
-    articles: list[dict] = get_articles()
+    articles: list[dict] = helpers.get_articles()
 
     tags: dict = {}
     for article in articles:
@@ -102,7 +78,7 @@ async def tags(request: Request, response_class=HTMLResponse):
 
 @app.get("/tags/{tag}")
 async def tag(tag: str, request: Request, response_class=HTMLResponse):
-    articles: list[dict] = get_articles()
+    articles: list[dict] = helpers.get_articles()
     articles = [x for x in filter(lambda x: tag in x.get('tags', []), articles)]
 
 
@@ -115,7 +91,7 @@ async def tag(tag: str, request: Request, response_class=HTMLResponse):
 async def page(slug: str, request: Request, response_class=HTMLResponse):
     path = pathlib.Path(f"pages/{slug}.md")
     try:
-        page: dict[str, str|dict] = load_content_from_markdown_file(path)
+        page: dict[str, str|dict] = helpers.load_content_from_markdown_file(path)
     except FileNotFoundError:
         return templates.TemplateResponse(
             request=request, name="404.html", status_code=404
