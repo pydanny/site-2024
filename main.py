@@ -1,13 +1,14 @@
-import yaml
-from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+import functools
+import pathlib
+
 import jinja2
 import markdown
-import functools
+import yaml
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-import pathlib
 
 env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
     extensions=['jinja2_time.TimeExtension', "jinja2.ext.debug"])
