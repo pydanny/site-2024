@@ -74,7 +74,7 @@ build/*
 env/
 
 # Python pyenv local version file
-.python-version
+# .python-version
 
 # Environment variables for docker-compose.
 .env

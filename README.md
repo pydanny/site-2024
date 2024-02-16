@@ -16,3 +16,9 @@ Create the virtualenv
 mkvirtualenv daniel.feldroy.com
 pip install -r requirements.txt
 ```
+
+# Running
+
+```
+uvicorn main:app --reload
+```
