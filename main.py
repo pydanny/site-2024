@@ -2,7 +2,7 @@ import functools
 import pathlib
 
 import jinja2
-import markdown
+import markdown as md
 import yaml
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -13,6 +13,8 @@ from fastapi.templating import Jinja2Templates
 env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
     extensions=['jinja2_time.TimeExtension', "jinja2.ext.debug"])
 templates = Jinja2Templates(env=env)
+
+markdown = functools.partial(md.markdown, extensions=['pymdownx.superfences'])
 
 
 app = FastAPI(docs_url="/api/docs")
@@ -52,7 +54,7 @@ async def index(request: Request, response_class=HTMLResponse):
 async def post(slug: str, request: Request, response_class=HTMLResponse):
     article = [x for x in filter(lambda x: x['slug'] == slug, get_articles())][0]
     content = pathlib.Path(f"posts/{slug}.md").read_text().split('---')[2]
-    article['content'] = markdown.markdown(content, extensions=['pymdownx.superfences'])
+    article['content'] = markdown(content)
 
     return templates.TemplateResponse(
         request=request, name="post.html", context={"article": article}
