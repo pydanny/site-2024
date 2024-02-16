@@ -15,15 +15,9 @@ env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
 templates = Jinja2Templates(env=env)
 
 
-
-
 app = FastAPI(docs_url="/api/docs")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-
-
-
 
 
 @app.get("/api")
@@ -33,39 +27,51 @@ async def root():
 
 @app.get("/")
 async def index(request: Request, response_class=HTMLResponse):
+    posts = helpers.list_posts()
+    recent_3 = posts[:3]
+
+    favorite_post_ids: list[str] = [
+        "code-code-code",
+        "thirty-minute-rule",
+        "whats-the-best-thing-about-working-for-octopus-energy-part-1",
+        "i-married-audrey-roy",        
+    ]
+    favorite_posts: list  = filter(lambda x: x['slug'] in favorite_post_ids, posts)
+
     return templates.TemplateResponse(
-        request=request, name="index.html"
+        request=request, name="index.html",
+        context={"recent_3": recent_3, "favorite_posts": favorite_posts}
     )
 
 
 @app.get("/posts/{slug}")
 async def post(slug: str, request: Request, response_class=HTMLResponse):
-    article = [x for x in filter(lambda x: x['slug'] == slug, helpers.get_articles())][0]
+    post = [x for x in filter(lambda x: x['slug'] == slug, helpers.list_posts())][0]
     content = pathlib.Path(f"posts/{slug}.md").read_text().split('---')[2]
-    article['content'] = helpers.markdown(content)
+    post['content'] = helpers.markdown(content)
 
     return templates.TemplateResponse(
-        request=request, name="post.html", context={"article": article}
+        request=request, name="post.html", context={"post": post}
     )    
 
 @app.get("/posts")
 async def posts(request: Request, response_class=HTMLResponse):
-    articles: list[dict] = helpers.get_articles()
+    posts: list[dict] = helpers.list_posts()
 
-    articles.sort(key=lambda x: x['date'], reverse=True)
+    posts.sort(key=lambda x: x['date'], reverse=True)
 
     return templates.TemplateResponse(
-        request=request, name="posts.html", context={"articles": articles}
+        request=request, name="posts.html", context={"posts": posts}
     )
 
 
 @app.get("/tags")
 async def tags(request: Request, response_class=HTMLResponse):
-    articles: list[dict] = helpers.get_articles()
+    posts: list[dict] = helpers.list_posts()
 
     tags: dict = {}
-    for article in articles:
-        for tag in article.get('tags', []):
+    for post in posts:
+        for tag in post.get('tags', []):
             if tag in tags:
                 tags[tag] += 1
             else:
@@ -78,12 +84,12 @@ async def tags(request: Request, response_class=HTMLResponse):
 
 @app.get("/tags/{tag}")
 async def tag(tag: str, request: Request, response_class=HTMLResponse):
-    articles: list[dict] = helpers.get_articles()
-    articles = [x for x in filter(lambda x: tag in x.get('tags', []), articles)]
+    posts: list[dict] = helpers.list_posts()
+    posts = [x for x in filter(lambda x: tag in x.get('tags', []), posts)]
 
 
     return templates.TemplateResponse(
-        request=request, name="tag.html", context={"tag": tag, "articles": articles}
+        request=request, name="tag.html", context={"tag": tag, "posts": posts}
     )
 
 

@@ -1,12 +1,12 @@
-<article>
-    <h2><a href="/posts/{{ article.slug }}">{{ article.title }}</a></h2>
+<post>
+    <h2><a href="/posts/{{ post.slug }}">{{ post.title }}</a></h2>
     <p>
-      {% if article.description %}
-      {{ article.description }}<br/>  
+      {% if post.description %}
+      {{ post.description }}<br/>  
       {% endif %}
-      <small><time datetime="{{ article.date }}">{{ article.date }}</time></small><br />
-      Tags: {% for tag in article.tags %}
+      <small><time datetime="{{ post.date }}">{{ post.date }}</time></small><br />
+      Tags: {% for tag in post.tags %}
         <a href="/tags/{{ tag }}">{{ tag }}</a>
       {% endfor %}
     </p>
-</article>
+</post>

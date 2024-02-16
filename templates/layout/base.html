@@ -2,6 +2,8 @@
 <head>
     {% if metadata %}
         <title>{{ metadata.title|default("Daniel Roy Greenfeld") }}</title>
+    {% elif title %}
+        <title>{{ title }}</title>
     {% else %}
         <title>Daniel Roy Greenfeld</title>
     {% endif %}

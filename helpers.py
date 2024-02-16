@@ -7,18 +7,18 @@ from pymdownx import emoji
 
 
 @functools.lru_cache
-def get_articles(published: bool = True) -> list[dict]:
-    articles: list[dict] = []
-    for article in pathlib.Path(".").glob("posts/*.md"):
-        raw: str = article.read_text().split('---')[1]
+def list_posts(published: bool = True) -> list[dict]:
+    posts: list[dict] = []
+    for post in pathlib.Path(".").glob("posts/*.md"):
+        raw: str = post.read_text().split('---')[1]
         data: dict = yaml.safe_load(raw)
-        data['slug'] = article.stem
-        articles.append(data)   
+        data['slug'] = post.stem
+        posts.append(data)   
 
-    articles = [x for x in filter(lambda x: x['published'] is True, articles)]
+    posts = [x for x in filter(lambda x: x['published'] is True, posts)]
 
-    articles.sort(key=lambda x: x['date'], reverse=True)
-    return [x for x in filter(lambda x: x['published'] is published, articles)]
+    posts.sort(key=lambda x: x['date'], reverse=True)
+    return [x for x in filter(lambda x: x['published'] is published, posts)]
 
 
 def load_content_from_markdown_file(path: pathlib.Path) -> dict[str, str|dict]:
