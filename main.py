@@ -1,4 +1,4 @@
-
+import collections
 import pathlib
 
 import jinja2
@@ -69,13 +69,18 @@ async def posts(request: Request, response_class=HTMLResponse):
 async def tags(request: Request, response_class=HTMLResponse):
     posts: list[dict] = helpers.list_posts()
 
-    tags: dict = {}
+    unsorted_tags: dict = {}
     for post in posts:
         for tag in post.get('tags', []):
-            if tag in tags:
-                tags[tag] += 1
+            if tag in unsorted_tags:
+                unsorted_tags[tag] += 1
             else:
-                tags[tag] = 1
+                unsorted_tags[tag] = 1
+
+    # Sort by value (number of articles per tag)
+    tags: dict = collections.OrderedDict(
+        sorted(unsorted_tags.items(),
+               key=lambda x: x[1], reverse=True))
 
     return templates.TemplateResponse(
         request=request, name="tags.html", context={"tags": tags}
