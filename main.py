@@ -2,12 +2,13 @@ import collections
 import pathlib
 
 import jinja2
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 import helpers
+import feeds
 
 
 env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"),
@@ -96,6 +97,17 @@ async def tag(tag: str, request: Request, response_class=HTMLResponse):
     return templates.TemplateResponse(
         request=request, name="tag.html", context={"tag": tag, "posts": posts}
     )
+
+
+@app.get("/feeds/{tag}.xml")
+async def feed(tag: str, request: Request, response_class=Response):
+    posts: list[dict] = helpers.list_posts()
+    if tag != "atom":
+        posts = [x for x in filter(lambda x: tag in x.get('tags', []), posts)]
+
+    xml: str = feeds.generate_feed(posts, tag)
+    
+    return Response(xml, media_type="application/xml")
 
 
 @app.get("/{slug}")
