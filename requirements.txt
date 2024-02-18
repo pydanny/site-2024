@@ -8,3 +8,7 @@ pyyaml
 markdown
 pymdown-extensions
 feedgen
+
+# Testing and linting
+ruff
+pytest

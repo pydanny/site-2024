@@ -1,15 +1,19 @@
-from datetime import date
+import functools
 import pathlib
+from datetime import date
 
 from feedgen.feed import FeedGenerator
 
 import helpers
 
 
-feeds = ['python', 'django', 'all']
+functools.lru_cache
+def generate_feed(tag: str) -> str:
+    posts: list[dict] = helpers.list_posts()[:3]
+    if tag != "atom":
+        posts = [x for x in filter(lambda x: tag in x.get('tags', []), posts)]
 
 
-def generate_feed(posts: list[dict], tag: str) -> str:
     base_url: str = 'https://daniel.feldroy.com'
 
     fg = FeedGenerator()
@@ -28,7 +32,6 @@ def generate_feed(posts: list[dict], tag: str) -> str:
     # Reverse the order of posts so feedgen orders things correctly
     posts.reverse()
     for post in posts:
-        print(post['title'])
         fe = fg.add_entry()
         fe.id(post['slug'])
         fe.title(post['title'])
@@ -36,7 +39,6 @@ def generate_feed(posts: list[dict], tag: str) -> str:
         path = pathlib.Path(f"posts/{post['slug']}.md")
         page = helpers.load_content_from_markdown_file(path)        
         fe.content(f"<![CDATA[ { page['html'] } ]]>")        
-        fe.category = tag
 
     return fg.atom_str(pretty=True)
 
