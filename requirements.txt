@@ -8,6 +8,7 @@ pyyaml
 markdown
 pymdown-extensions
 feedgen
+gunicorn
 
 # Testing and linting
 ruff
