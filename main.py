@@ -3,6 +3,7 @@ import pathlib
 
 import jinja2
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -17,6 +18,7 @@ templates = Jinja2Templates(env=env)
 
 
 app = FastAPI(docs_url="/api/docs")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -105,6 +107,11 @@ async def feed(tag: str, request: Request, response_class=Response):
     xml: str = feeds.generate_feed(tag)
     
     return Response(xml, media_type="application/xml")
+
+
+@app.get("/healthcheck")
+def read_root():
+    return {"status": "ok"}
 
 
 @app.get("/{slug}")

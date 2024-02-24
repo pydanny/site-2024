@@ -1,0 +1,6 @@
+name: daniel-feldroy-com
+services:
+- name: web
+  github:
+    repo: pydanny/site-2024
+    branch: main
