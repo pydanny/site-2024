@@ -1,1 +1,2 @@
-web: gunicorn --config gunicorn_config.py main:app
+# TODO: Modify this Procfile to fit your needs
+web: gunicorn main:app
