@@ -21,12 +21,12 @@ def generate_feed(tag: str) -> str:
     fg.title(f"Posts tagged with {tag}")
     fg.author({'name': 'Daniel Roy Greenfeld', 'email': 'daniel@feldroy.com'})
     fg.description("Inside the head of Daniel Roy Greenfeld")
-    fg.link( href='http://daniel.feldroy.com', rel='alternate' )
+    fg.link( href='https://daniel.feldroy.com', rel='alternate' )
     fg.logo(f'{base_url}/images/pydanny-cartwheel.png')
     fg.image(f'{base_url}/images/pydanny-cartwheel.png')
     fg.copyright(f'All rights reserved {date.today().year}, Daniel Roy Greenfeld')
     fg.subtitle('Inside the head of pydanny')
-    fg.link( href='http://daniel.feldroy.com', rel='self' )
+    fg.link( href='https://daniel.feldroy.com', rel='self' )
     fg.language('en')
 
     # Reverse the order of posts so feedgen orders things correctly
@@ -35,7 +35,7 @@ def generate_feed(tag: str) -> str:
         fe = fg.add_entry()
         fe.id(post['slug'])
         fe.title(post['title'])
-        fe.link(href=f"http://daniel.feldroy.com/posts/{post['slug']}")
+        fe.link(href=f"https://daniel.feldroy.com/posts/{post['slug']}")
         path = pathlib.Path(f"posts/{post['slug']}.md")
         page = helpers.load_content_from_markdown_file(path)        
         fe.content(f"<![CDATA[ { page['html'] } ]]>")        
