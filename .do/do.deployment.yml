@@ -1,7 +1,0 @@
-spec:
-  name: daniel-feldroy-com
-  services:
-  - name: web
-    git:
-      branch: main
-      repo_clone_url: https://github.com/pydanny/site-2024
