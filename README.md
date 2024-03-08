@@ -14,7 +14,8 @@ Create the virtualenv
 
 ```
 mkvirtualenv daniel.feldroy.com
-pip install -r requirements.txt
+pip install uv
+uv pip install -r requirements.txt
 ```
 
 # Running

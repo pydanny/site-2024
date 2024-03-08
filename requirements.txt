@@ -9,6 +9,7 @@ markdown
 pymdown-extensions
 feedgen
 gunicorn
+fastapi-blog
 
 # Testing and linting
 ruff
